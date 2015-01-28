@@ -16,7 +16,7 @@ use Xoops\Core\Kernel\CriteriaCompo;
  * Blocks functions
  *
  * @copyright   The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license     GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license     GNU GPL 2 (http://www.gnu.org/licenses/gpl-2.0.html)
  * @author      Kazumi Ono (AKA onokazu)
  * @package     system
  * @version     $Id$
@@ -102,7 +102,7 @@ function b_system_user_show()
     array_push($block['modules'], array(
         'name'  => $name,
         'link'  => $xoops->url('viewpmsg.php'),
-        'icon'  => 'icon-wrench',
+        'icon'  => 'icon-envelope',
         'class' => $class,
     ));
 
@@ -113,6 +113,6 @@ function b_system_user_show()
         'icon' => 'icon-off',
     ));
 
-    $block['active_url'] = Xoops_Request::getInstance()->getUrl();
+    $block['active_url'] = \Xoops\Core\HttpRequest::getInstance()->getUrl();
     return $block;
 }

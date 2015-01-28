@@ -14,7 +14,7 @@
  * Xoops Cpanel default GUI class
  *
  * @copyright   The XOOPS project http://sf.net/projects/xoops/
- * @license     http://www.fsf.org/copyleft/gpl.html GNU public license
+ * @license     GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package     system
  * @usbpackage  GUI
  * @since       2.4
@@ -36,7 +36,7 @@ class XoopsGuiDefault
         $xoops->loadLocale('system');
 
         $xoops->theme()->addBaseStylesheetAssets('@jqueryuicss');
-        $xoops->theme()->addBaseStylesheetAssets('media/xoops/css/moduladmin.css');
+        $xoops->theme()->addStylesheet('media/xoops/css/moduladmin.css');
         $xoops->theme()->addStylesheet(XOOPS_ADMINTHEME_URL . '/default/css/style.css');
 
         $xoops->theme()->addBaseScriptAssets('@jquery');

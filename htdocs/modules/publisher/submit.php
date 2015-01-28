@@ -9,6 +9,8 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+use Xoops\Core\Request;
+
 /**
  * @copyright       The XUUPS Project http://sourceforge.net/projects/xuups/
  * @license         GNU GPL V2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
@@ -36,7 +38,7 @@ $groups = $xoops->isUser() ? $xoops->user->getGroups() : XOOPS_GROUP_ANONYMOUS;
 $gperm_handler = $xoops->getHandlerGroupperm();
 $module_id = $publisher->getModule()->getVar('mid');
 
-$itemid = \Xmf\Request::getInt('itemid');
+$itemid = Request::getInt('itemid');
 if ($itemid != 0) {
     // We are editing or deleting an article
     /* @var $itemObj PublisherItem */
@@ -123,7 +125,7 @@ switch ($op) {
         // Putting the values about the ITEM in the ITEM object
         $itemObj->setVarsFromRequest();
 
-        $xoops->header('publisher_submit.tpl');
+        $xoops->header('module:publisher/publisher_submit.tpl');
         $xoTheme = $xoops->theme();
         $xoTheme->addBaseScriptAssets('@jquery');
         $xoTheme->addBaseScriptAssets('modules/publisher/js/publisher.js');
@@ -206,7 +208,7 @@ switch ($op) {
 
     case 'add':
     default:
-        $xoops->header('publisher_submit.tpl');
+        $xoops->header('module:publisher/publisher_submit.tpl');
         $xoopsTpl = $xoops->tpl();
         $xoTheme = $xoops->theme();
         $xoTheme->addScript(PUBLISHER_URL . '/js/publisher.js');

@@ -15,7 +15,7 @@ use Xoops\Core\Database\Connection;
  * page module
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         page
  * @since           2.6.0
  * @author          Mage Grégory (AKA Mage)
@@ -80,6 +80,8 @@ class PagePage_content extends XoopsObject
         $page = Page::getInstance();
         $ret = parent::getValues($keys, $format, $maxDepth);
         $ret['rating'] = number_format($this->getVar('content_rating'), 1);
+        // these next two lines are rather silly
+        $ret['content_authorid'] = $this->getVar('content_author');
         $ret['content_author'] = XoopsUser::getUnameFromId($this->getVar('content_author'), true);
         $ret['content_date'] = XoopsLocale::formatTimestamp($this->getVar('content_create'), $page->getConfig('page_dateformat'));
         $ret['content_time'] = XoopsLocale::formatTimestamp($this->getVar('content_create'), $page->getConfig('page_timeformat'));

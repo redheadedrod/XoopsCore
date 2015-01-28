@@ -9,11 +9,13 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
+use Xoops\Core\Request;
+
 /**
  * banners module
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         banners
  * @since           2.6.0
  * @author          Mage Grégory (AKA Mage)
@@ -24,7 +26,6 @@ include dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'mainfile.php';
 
 $xoops = Xoops::getInstance();
 $helper = Banners::getInstance();
-$request = $xoops->request();
 // Get banners handler
 $banner_Handler = $helper->getHandlerBanner();
 $client_Handler = $helper->getHandlerBannerclient();
@@ -33,7 +34,7 @@ $member_handler = $xoops->getHandlerMember();
 // Parameters
 $nb_banners = $helper->getConfig('banners_pager');
 // Get Action type
-$op = $request->asStr('op', 'list');
+$op = Request::getCmd('op', 'list');
 
 switch ($op) {
 
@@ -63,10 +64,10 @@ switch ($op) {
             $xoops->redirect(XOOPS_URL, 2, XoopsLocale::E_NO_ACCESS_PERMISSION);
         }
         // Get start pager
-        $start = $request->asInt('start', 0);
-        $startF = $request->asInt('startF', 0);
+        $start = Request::getInt('start', 0);
+        $startF = Request::getInt('startF', 0);
         // Call header
-        $xoops->header('banners_client.html');
+        $xoops->header('module:banners/banners_client.tpl');
         // Define Stylesheet
         $xoops->theme()->addBaseStylesheetAssets('modules/system/css/admin.css');
         $xoops->theme()->addBaseStylesheetAssets('@jqueryuicss');
@@ -149,8 +150,8 @@ switch ($op) {
                 } else {
                     $banner['clickurl'] = $banner_arr[$i]->getVar("banner_clickurl");
                 }
-                $xoops->tpl()->append_by_ref('banner', $banner);
-                $xoops->tpl()->append_by_ref('popup_banner', $banner);
+                $xoops->tpl()->appendByRef('banner', $banner);
+                $xoops->tpl()->appendByRef('popup_banner', $banner);
                 unset($banner);
             }
         } else {
@@ -222,8 +223,8 @@ switch ($op) {
                 $banner_finish['clickurl'] = $banner_finish_arr[$i]->getVar("banner_clickurl");
                 $banner_finish['name'] = $client_name;
                 $banner_finish['uid'] = $client_uid;
-                $xoops->tpl()->append_by_ref('banner_finish', $banner_finish);
-                $xoops->tpl()->append_by_ref('popup_banner_finish', $banner_finish);
+                $xoops->tpl()->appendByRef('banner_finish', $banner_finish);
+                $xoops->tpl()->appendByRef('popup_banner_finish', $banner_finish);
                 unset($banner_finish);
             }
         }
@@ -259,10 +260,10 @@ switch ($op) {
         if ($access == false) {
             $xoops->redirect(XOOPS_URL, 2, XoopsLocale::E_NO_ACCESS_PERMISSION);
         }
-        $bid = $request->asInt('bid', 0);
+        $bid = Request::getInt('bid', 0);
         if ($bid > 0) {
             // Call header
-            $xoops->header('banners_client.html');
+            $xoops->header('module:banners/banners_client.tpl');
             $obj = $banner_Handler->get($bid);
             $form = new Xoops\Form\ThemeForm(_AM_BANNERS_CLIENTS_EDIT, 'form', 'index.php', 'post', true);
             $form->addElement(new Xoops\Form\Text(_AM_BANNERS_BANNERS_CLICKURL, 'clickurl', 80, 255, $obj->getVar('banner_clickurl')), false);
@@ -297,7 +298,7 @@ switch ($op) {
         if (!$xoops->security()->check()) {
             $xoops->redirect("index.php", 3, implode(",", $xoops->security()->getErrors()));
         }
-        $bid = $request->asInt('bid', 0);
+        $bid = $Request::getInt('bid', 0);
         if ($bid > 0) {
             $obj = $banner_Handler->get($bid);
             $criteria = new CriteriaCompo();
@@ -310,7 +311,7 @@ switch ($op) {
                     }
                 }
             }
-            $obj->setVar("banner_clickurl", $request->asStr('clickurl', ''));
+            $obj->setVar("banner_clickurl", Request::getString('clickurl', ''));
             if ($banner_Handler->insert($obj)) {
                 $xoops->redirect("index.php", 2, _AM_BANNERS_DBUPDATED);
             }
@@ -338,7 +339,7 @@ switch ($op) {
         if ($access == false) {
             $xoops->redirect(XOOPS_URL, 2, XoopsLocale::E_NO_ACCESS_PERMISSION);
         }
-        $bid = $request->asInt('bid', 0);
+        $bid = Request::getInt('bid', 0);
         if ($bid > 0) {
             $banner = $banner_Handler->get($bid);
             $criteria = new CriteriaCompo();
@@ -390,7 +391,7 @@ switch ($op) {
         break;
 
     case 'click':
-        $bid = $request->asInt('bid', 0);
+        $bid = Request::getInt('bid', 0);
         if ($bid > 0) {
             $banner = $banner_Handler->get($bid);
             if ($banner) {

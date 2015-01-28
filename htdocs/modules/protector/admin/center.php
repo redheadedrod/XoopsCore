@@ -113,7 +113,7 @@ if (!empty($_POST['action'])) {
     }
 }
 // beggining of Output
-$xoops->header('protector_center.html');
+$xoops->header('admin:protector/protector_center.html');
 
 $admin_page = new \Xoops\Module\Admin();
 $admin_page->renderNavigation('center.php');
@@ -189,7 +189,7 @@ while (list($lid, $uid, $ip, $agent, $type, $description, $timestamp, $uname) = 
     $log_arr['type'] = $type;
     $log_arr['description'] = $description;
 
-    $xoops->tpl()->append_by_ref('log', $log_arr);
+    $xoops->tpl()->appendByRef('log', $log_arr);
     unset($table_arr);
 }
 

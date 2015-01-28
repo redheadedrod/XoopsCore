@@ -9,11 +9,13 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
+use Xoops\Core\Request;
+
 /**
  * XOOPS misc utilities
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license         GNU GPL 2 (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         core
  * @since           2.0.0
  * @version         $Id$
@@ -22,11 +24,10 @@
 include __DIR__ . DIRECTORY_SEPARATOR . 'mainfile.php';
 
 $xoops = Xoops::getInstance();
-$xoops->disableErrorReporting();
+$xoops->logger()->quiet();
 
-$request = Xoops_Request::getInstance();
-$action = $request->asStr('action', '');
-$type = $request->asStr('type', '');
+$action = Request::getCmd('action', '');
+$type = Request::getCmd('type', '');
 
 if ($action == "showpopups") {
     $xoops->simpleHeader(false);
@@ -35,7 +36,7 @@ if ($action == "showpopups") {
     $closebutton = 1;
     switch ($type) {
         case "friend":
-            $op = $request->asStr('op', 'sendform');
+            $op = Request::getCmd('op', 'sendform');
             $tpl = new XoopsTpl();
             if (!$xoops->security()->check() || $op == "sendform") {
                 if ($xoops->isUser()) {
@@ -73,7 +74,7 @@ if ($action == "showpopups") {
 
                 $tpl->assign('closebutton', 0);
                 $tpl->assign('form', $form->render());
-            } elseif ($_POST['op'] == "sendsite") {
+            } elseif ($op == "sendsite") {
                 $myts = MyTextsanitizer::getInstance();
                 if ($xoops->isUser()) {
                     $ymail = $xoops->user->getVar("email");
@@ -110,11 +111,11 @@ if ($action == "showpopups") {
                     $tpl->assign('message', XoopsLocale::S_REFERENCE_TO_SITE_SENT);
                 }
             }
-            $tpl->display('module:system|system_misc_friend.html');
+            $tpl->display('module:system/system_misc_friend.tpl');
             break;
         case 'online':
             $isadmin = $xoops->userIsAdmin;
-            $start = $request->asInt('start', 0);
+            $start = Request::getInt('start', 0);
             $online_handler = $xoops->getHandlerOnline();
             $online_total = $online_handler->getCount();
             $limit = ($online_total > 20) ? 20 : $online_total;
@@ -151,7 +152,7 @@ if ($action == "showpopups") {
             $tpl->assign('onlineusers', $onlineUsers);
             $tpl->assign('isadmin', $isadmin);
             $tpl->assign('closebutton', $closebutton);
-            $tpl->display('module:system|system_misc_online.html');
+            $tpl->display('module:system/system_misc_online.tpl');
             break;
         case 'ssllogin':
             if ($xoops->getConfig('use_ssl') && isset($_POST[$xoops->getConfig('sslpost_name')]) && $xoops->isUser()) {

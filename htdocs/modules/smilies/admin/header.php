@@ -13,7 +13,7 @@
  * smilies module
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         smilies
  * @since           2.6.0
  * @author          Mage Grégory (AKA Mage)
@@ -26,4 +26,3 @@ XoopsLoad::load('system', 'system');
 $xoops = Xoops::getInstance();
 $system = System::getInstance();
 $helper = Xoops\Module\Helper::getHelper('smilies');
-$request = Xoops_Request::getInstance();

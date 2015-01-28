@@ -9,11 +9,13 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
+use Xoops\Core\Request;
+
 /**
  * XOOPS global search
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         http://www.fsf.org/copyleft/gpl.html GNU General Public License (GPL)
+ * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         core
  * @since           2.0.0
  * @author          Kazumi Ono (AKA onokazu)
@@ -31,14 +33,13 @@ if (!$search->getConfig('enable_search')) {
 
 $xoops = Xoops::getInstance();
 
-$request = Xoops_Request::getInstance();
-$action = $request->asStr('action', 'search');
-$query = $request->asStr('query', '');
-$andor = $request->asStr('query', 'AND');
-$mid = $request->asInt('mid', 0);
-$uid = $request->asInt('uid', 0);
-$start = $request->asInt('start', 0);
-$mids = $request->asArray('mids', array());
+$action = Request::getCmd('action', 'search');
+$query = Request::getString('query', '');
+$andor = Request::getWord('query', 'AND');
+$mid = Request::getInt('mid', 0);
+$uid = Request::getInt('uid', 0);
+$start = Request::getInt('start', 0);
+$mids = Request::getArray('mids', array());
 
 $queries = array();
 
@@ -83,7 +84,8 @@ $queries_pattern = array();
 $myts = MyTextSanitizer::getInstance();
 if ($action != 'showallbyuser') {
     if ($andor != "exact") {
-        $temp_queries = preg_split('/[\s,]+/', $query);
+        //$temp_queries = preg_split('/[\s,]+/', $query);
+        $temp_queries = str_getcsv($query, ' ', '"');
         foreach ($temp_queries as $q) {
             $q = trim($q);
             if (mb_strlen($q) >= $search->getConfig('keyword_min')) {
@@ -116,7 +118,7 @@ switch ($action) {
             unset($mids);
             $mids = array_keys($modules);
         }
-        $xoops->header('module:search|search.html');
+        $xoops->header('module:search/search.tpl');
         $nomatch = true;
         $xoops->tpl()->assign('search', true);
         $xoops->tpl()->assign('queries', $queries);
@@ -182,7 +184,7 @@ switch ($action) {
 
     case "showall":
     case 'showallbyuser':
-        $xoops->header('module:search|search.html');
+        $xoops->header('module:search/search.tpl');
         $xoops->tpl()->assign('search', true);
         $xoops->tpl()->assign('queries', $queries);
         $xoops->tpl()->assign('ignored_words', sprintf(_MD_SEARCH_IGNOREDWORDS, $search->getConfig('keyword_min')));

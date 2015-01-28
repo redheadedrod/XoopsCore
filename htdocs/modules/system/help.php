@@ -16,7 +16,7 @@ use Xoops\Core\Kernel\CriteriaCompo;
  * System help page
  *
  * @copyright   The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license     GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license     GNU GPL 2 (http://www.gnu.org/licenses/gpl-2.0.html)
  * @author      Andricq Nicolas (AKA MusS)
  * @package     system
  * @version     $Id$
@@ -32,7 +32,7 @@ $page = $system->cleanVars($_REQUEST, 'page', '', 'string');
 $mid = $system->cleanVars($_REQUEST, 'mid', 0, 'int');
 
 // Define main template
-$xoops->header('system_help.html');
+$xoops->header('admin:system/system_help.tpl');
 // Define Stylesheet
 $xoops->theme()->addStylesheet('modules/system/css/admin.css');
 $xoops->theme()->addStylesheet('modules/system/css/help.css');
@@ -61,7 +61,7 @@ if ($mid > 0) {
                     $help['name'] = system_adminVersion($directory, 'name');
                     $help['link'] = 'help.php?mid=' . $mid . '&amp;' . system_adminVersion($directory, 'help');
 
-                    $xoops->tpl()->append_by_ref('help', $help);
+                    $xoops->tpl()->appendByRef('help', $help);
                     unset($help);
                 }
                 unset($modversion);
@@ -88,7 +88,7 @@ if ($mid > 0) {
         if (( $module->getInfo('help') != '' ) && ($j == 0)) {
             $help['name'] = $module->getInfo('name');
             $help['link'] = 'help.php?mid=' . $mid . '&amp;' . $module->getInfo('help');
-            $xoopsTpl->append_by_ref('help', $help);
+            $xoopsTpl->appendByRef('help', $help);
         }
         unset($help);
     }

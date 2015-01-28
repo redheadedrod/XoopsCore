@@ -9,11 +9,13 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
+use Xoops\Core\Request;
+
 /**
  * avatars module
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         avatar
  * @since           2.6.0
  * @author          Mage Grégory (AKA Mage)
@@ -25,9 +27,8 @@ include dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'mainfile.php';
 $xoops = Xoops::getInstance();
 $helper = Avatars::getInstance();
 
-$request = $xoops->request();
 // Get Action type
-$op = $request->asStr('op', 'list');
+$op = Request::getCmd('op', 'list');
 
 // If not a user, redirect
 if (!$xoops->isUser()) {
@@ -36,7 +37,7 @@ if (!$xoops->isUser()) {
 }
 
 // Call header
-$xoops->header('avatars_editavatar.html');
+$xoops->header('module:avatars/avatars_editavatar.tpl');
 
 // Get avatar handler
 $avatar_Handler = $helper->getHandlerAvatar();
@@ -83,7 +84,7 @@ switch ($op) {
         if (!$xoops->security()->check()) {
             $xoops->redirect('index.php', 3, implode('<br />', $xoops->security()->getErrors()));
         }
-        $uid = $request->asInt('uid', 0);
+        $uid = Request::getInt('uid', 0);
         if (empty($uid) || $xoops->user->getVar('uid') != $uid) {
             $xoops->redirect('index.php', 3, XoopsLocale::E_NO_ACCESS_PERMISSION);
             exit();
@@ -140,7 +141,7 @@ switch ($op) {
                 }
             }
         } else {
-            $user_avatar = $request->asStr('user_avatar', 'blank.gif');
+            $user_avatar = Request::getString('user_avatar', 'blank.gif');
             $oldavatar = $xoops->user->getVar('user_avatar');
             $xoops->user->setVar('user_avatar', $user_avatar);
             $member_handler = $xoops->getHandlerMember();

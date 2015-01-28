@@ -10,12 +10,13 @@
 */
 
 use Xoops\Core\PreloadItem;
+use Xoops\Core\Request;
 
 /**
  * Images core preloads
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         http://www.fsf.org/copyleft/gpl.html GNU public license
+ * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @author          trabis <lusopoemas@gmail.com>
  */
 class ImagesPreload extends PreloadItem
@@ -38,8 +39,8 @@ class ImagesPreload extends PreloadItem
     public static function eventCoreImage($args)
     {
         $uri = '';
-        foreach (Xoops_Request::getInstance()->getParam() as $k => $v) {
-            $uri .= $k . '=' . $v . '&';
+        foreach (Request::get() as $k => $v) {
+            $uri .=  urlencode($k) . '=' . urlencode($v) . '&';
         }
         Xoops::getInstance()->redirect("modules/images/image.php?{$uri}", 0);
     }
@@ -47,8 +48,8 @@ class ImagesPreload extends PreloadItem
     public static function eventCoreImagemanager($args)
     {
         $uri = '';
-        foreach (Xoops_Request::getInstance()->getParam() as $k => $v) {
-            $uri .= $k . '=' . $v . '&';
+        foreach (Request::get() as $k => $v) {
+            $uri .=  urlencode($k) . '=' . urlencode($v) . '&';
         }
         Xoops::getInstance()->redirect("modules/images/imagemanager.php?{$uri}", 0);
     }

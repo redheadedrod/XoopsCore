@@ -9,11 +9,13 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
+use Xoops\Core\Request;
+
 /**
  * XOOPS
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license         GNU GPL 2 (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         class
  * @since           2.6.0
  * @author          trabis <lusopoemas@gmail.com>
@@ -290,7 +292,7 @@ class Xoops
                 $tpl_info = $this->getTplInfo($tpl_name);
                 $this->tpl_name = $tpl_info['tpl_name'];
             } else {
-                $tpl_name = 'module:system|system_dummy.html';
+                $tpl_name = 'module:system/system_dummy.tpl';
                 $tpl_info = $this->getTplInfo($tpl_name);
                 $this->tpl_name = $tpl_info['tpl_name'];
             }
@@ -482,9 +484,10 @@ class Xoops
      */
     public function themeSelect()
     {
-        if (!empty($_POST['xoops_theme_select']) && in_array($_POST['xoops_theme_select'], $this->getConfig('theme_set_allowed'))) {
-            $this->setConfig('theme_set', $_POST['xoops_theme_select']);
-            $_SESSION['xoopsUserTheme'] = $_POST['xoops_theme_select'];
+        $xoopsThemeSelect = Request::getString('xoops_theme_select','','POST');
+        if (!empty($xoopsThemeSelect) && in_array($xoopsThemeSelect, $this->getConfig('theme_set_allowed'))) {
+            $this->setConfig('theme_set', $xoopsThemeSelect);
+            $_SESSION['xoopsUserTheme'] = $xoopsThemeSelect;
         } else {
             if (!empty($_SESSION['xoopsUserTheme']) && in_array($_SESSION['xoopsUserTheme'], $this->getConfig('theme_set_allowed'))) {
                 $this->setConfig('theme_set', $_SESSION['xoopsUserTheme']);
@@ -494,39 +497,53 @@ class Xoops
 
     /**
      * Gets module, type and file from a tpl name
-     * It also returns the correct tpl name in case it is not well formed
      *
-     * @param string $tpl_name
+     * @param string $tpl_name in form type:module/filename.tpl
      *
-     * @return array;
+     * @return array|false associative array of 'tpl_name', 'type', 'module', 'file'
+     *                     or false on error
      */
     public function getTplInfo($tpl_name)
     {
-        $ret = array();
-        $ret['type'] = $this->isAdminSide ? 'admin' : 'module';
-        $info = explode(':', $tpl_name);
-        if (count($info) == 2) {
-            $ret['type'] = $info[0];
-            $tpl_name = str_replace($ret['type'] . ':', '', $tpl_name);
-        }
-
-        if ($ret['type'] == 'db') {
-            //For legacy compatibility
-            $ret['type'] = $this->isAdminSide ? 'admin' : 'module';
-        }
-
-        $info = explode('|', $tpl_name);
-        if (count($info) == 2) {
-            $ret['module'] = $info[0];
-            $ret['file'] = $info[1];
-        } else {
-            $ret['module'] = 'system';
-            $ret['file'] = $tpl_name;
-            if ($this->isModule()) {
-                $ret['module'] = $this->module->getVar('dirname', 'n');
+        $parts = array();
+        $ret = false;
+        $matched = preg_match('#(\w+):(\w+)/(.*)$#', $tpl_name, $parts);
+        if ($matched) {
+            $names = array('tpl_name', 'type', 'module', 'file');
+            $ret = array();
+            for ($i=0; $i<4; ++$i) {
+                 $ret[$names[$i]] = $parts[$i];
             }
+        } else {
+            // this should be eleminated
+            $this->events()->triggerEvent('debug.log', "Sloppy template: " . $tpl_name);
+            $ret = array();
+            $ret['type'] = $this->isAdminSide ? 'admin' : 'module';
+            $info = explode(':', $tpl_name);
+            if (count($info) == 2) {
+                $ret['type'] = $info[0];
+                $tpl_name = str_replace($ret['type'] . ':', '', $tpl_name);
+            }
+
+            if ($ret['type'] == 'db') {
+                //For legacy compatibility
+                $ret['type'] = $this->isAdminSide ? 'admin' : 'module';
+            }
+
+            $info = explode('|', $tpl_name);
+            if (count($info) == 2) {
+                $ret['module'] = $info[0];
+                $ret['file'] = $info[1];
+            } else {
+                $ret['module'] = 'system';
+                $ret['file'] = $tpl_name;
+                if ($this->isModule()) {
+                    $ret['module'] = $this->module->getVar('dirname', 'n');
+                }
+            }
+            $ret['tpl_name'] = $ret['type'] . ':' . $ret['module'] . '/' . $ret['file'];
         }
-        $ret['tpl_name'] = $ret['type'] . ':' . $ret['module'] . '|' . $ret['file'];
+
         return $ret;
     }
 
@@ -548,7 +565,7 @@ class Xoops
         //For legacy
         if (!$tpl_name && isset($this->option['template_main'])) {
             $tpl_name = $this->option['template_main'];
-            $this->deprecated('XoopsOption \'template_main\' is deprecated, please use $xoops->header(\'templatename.html\') instead');
+            $this->deprecated('XoopsOption \'template_main\' is deprecated, please use $xoops->header(\'templatename.tpl\') instead');
         }
         $this->theme($tpl_name);
         $this->tpl()->assign('xoops', $this);
@@ -570,11 +587,11 @@ class Xoops
             if (@is_object($this->theme()->plugins['XoopsThemeBlocksPlugin'])) {
                 $aggreg = $this->theme()->plugins['XoopsThemeBlocksPlugin'];
                 // Backward compatibility code for pre 2.0.14 themes
-                $this->tpl()->assign_by_ref('xoops_lblocks', $aggreg->blocks['canvas_left']);
-                $this->tpl()->assign_by_ref('xoops_rblocks', $aggreg->blocks['canvas_right']);
-                $this->tpl()->assign_by_ref('xoops_ccblocks', $aggreg->blocks['page_topcenter']);
-                $this->tpl()->assign_by_ref('xoops_clblocks', $aggreg->blocks['page_topleft']);
-                $this->tpl()->assign_by_ref('xoops_crblocks', $aggreg->blocks['page_topright']);
+                $this->tpl()->assignByRef('xoops_lblocks', $aggreg->blocks['canvas_left']);
+                $this->tpl()->assignByRef('xoops_rblocks', $aggreg->blocks['canvas_right']);
+                $this->tpl()->assignByRef('xoops_ccblocks', $aggreg->blocks['page_topcenter']);
+                $this->tpl()->assignByRef('xoops_clblocks', $aggreg->blocks['page_topleft']);
+                $this->tpl()->assignByRef('xoops_crblocks', $aggreg->blocks['page_topright']);
                 $this->tpl()->assign('xoops_showlblock', !empty($aggreg->blocks['canvas_left']));
                 $this->tpl()->assign('xoops_showrblock', !empty($aggreg->blocks['canvas_right']));
                 $this->tpl()
@@ -587,7 +604,7 @@ class Xoops
                 $this->theme()->contentCacheLifetime = isset($cache_times[$this->module->getVar('mid')]) ? $cache_times[$this->module->getVar('mid')] : 0;
                 // Tricky solution for setting cache time for homepage
             } else {
-                if ($this->tpl_name == 'module:system|system_homepage.html') {
+                if ($this->tpl_name == 'module:system/system_homepage.tpl') {
                     // $this->theme->contentCacheLifetime = 604800;
                 }
             }
@@ -656,14 +673,6 @@ class Xoops
     public function isAdmin()
     {
         return $this->userIsAdmin;
-    }
-
-    /**
-     * @return Xoops_Request_Http
-     */
-    public function request()
-    {
-        return Xoops_Request::getInstance();
     }
 
     /**
@@ -972,7 +981,7 @@ class Xoops
         }
 
         $language = empty($language) ? XoopsLocale::getLegacyLanguage() : $language;
-        // expanded domain to multiple categories, e.g. module:system, framework:filter, etc.
+        // expanded domain to multiple categories, e.g. module:Fsystem, framework:filter, etc.
         if ((empty($domain) || 'global' == $domain)) {
             $path = '';
         } else {
@@ -1217,7 +1226,7 @@ class Xoops
             return '';
         } else {
             $this->tpl()->assign('alert_msg', $alert_msg);
-            $ret = $this->tpl()->fetch('module:system|system_alert.html');
+            $ret = $this->tpl()->fetch('module:system/system_alert.tpl');
             return $ret;
         }
     }
@@ -1276,7 +1285,7 @@ class Xoops
             $this->tpl()->assign('token', $this->security()->getTokenHTML());
         }
         $this->tpl()->assign('hiddens', $str_hiddens);
-        $this->tpl()->display('module:system|system_confirm.html');
+        $this->tpl()->display('module:system/system_confirm.tpl');
     }
 
     /**
@@ -1467,7 +1476,7 @@ class Xoops
         $this->tpl()->assign('lang_ifnotreload', sprintf(XoopsLocale::F_IF_PAGE_NOT_RELOAD_CLICK_HERE, $url));
 
         $this->events()->triggerEvent('core.include.functions.redirectheader.end');
-        $this->tpl()->display('module:system|system_redirect.html');
+        $this->tpl()->display('module:system/system_redirect.tpl');
         exit();
     }
 
@@ -1771,26 +1780,31 @@ class Xoops
      * @param string  $url              URL
      * @param boolean $includeSubdomain true to include include subdomains,
      *                                  default is false registerable domain only
+     * @param boolean $returnObject     true to return Pdp\Uri\Url\Host object
+     *                                  false returns domain as string
      *
-     * @return mixed string domain, or null if domain is invalid
+     * @return Pdp\Uri\Url\Host|string|null domain, or null if domain is invalid
      */
-    function getBaseDomain($url, $includeSubdomain = false)
+    function getBaseDomain($url, $includeSubdomain = false, $returnObject = false)
     {
         $pslManager = new \Pdp\PublicSuffixListManager();
         $parser = new \Pdp\Parser($pslManager->getList());
 
         $url=mb_strtolower($url, 'UTF-8');
 
-        // use php-domain-parser to give us just the domain
-        $pdp = $parser->parseUrl($url);
-        //var_dump($pdp->host);
-
-        $host = $pdp->host->host;
+        try {
+            // use php-domain-parser to give us just the domain
+            $pdp = $parser->parseUrl($url);
+            $host = $pdp->host->host;
+        } catch (\Exception $e) {
+            $this->events()->triggerEvent('core.exception', $e);
+            return null;
+        }
         // check for exceptions, localhost and ip address (v4 & v6)
         if (!empty($host)) {
             // localhost exception
             if ($host=='localhost') {
-                return $host;
+                return $returnObject ? $pdp->host : $host;
             }
             // Check for IPV6 URL (see http://www.ietf.org/rfc/rfc2732.txt)
             // strip brackets before validating
@@ -1799,7 +1813,7 @@ class Xoops
             }
             // ip address exception
             if (filter_var($host, FILTER_VALIDATE_IP)) {
-                return $host;
+                return $returnObject ? new \Pdp\Uri\Url\Host(null, null, null, $host) : $host;
             }
         }
 
@@ -1807,27 +1821,7 @@ class Xoops
         if (!empty($host) && $includeSubdomain) {
             $host = $pdp->host->host;
         }
-
-        return($host);
-    }
-
-    /**
-     * Function to get the domain from a URL.
-     *
-     * @param string $url the URL to be stripped.
-     *
-     * @return string
-     * @deprecated
-     */
-    public function getUrlDomain($url)
-    {
-        $domain = '';
-        $_URL = parse_url($url);
-
-        if (!empty($_URL['host'])) {
-            $domain = $_URL['host'];
-        }
-        return $domain;
+        return $returnObject ? $pdp->host : $host;
     }
 
     /**
@@ -1846,7 +1840,7 @@ class Xoops
             $module = $tplfile->getVar('tpl_module', 'n');
             $type = $tplfile->getVar('tpl_type', 'n');
             $tpl = new XoopsTpl();
-            return $tpl->touch($type . ':' . $module . '|' . $file);
+            return $tpl->touch($type . ':' . $module . '/' . $file);
         }
         return false;
     }
@@ -1860,22 +1854,9 @@ class Xoops
      */
     public function templateClearModuleCache($mid)
     {
-        $block_arr = $this->getHandlerBlock()->getByModule($mid);
-        $count = count($block_arr);
-        if ($count > 0) {
-            $xoopsTpl = new XoopsTpl();
-            $xoopsTpl->caching = 2;
-            /* @var XoopsBlock $block */
-            foreach ($block_arr as $block) {
-                if ($block->getVar('template') != '') {
-                    $xoopsTpl->clear_cache(
-                        XOOPS_ROOT_PATH . "/modules/" . $block->getVar('dirname')
-                        . "/templates/blocks/" . $block->getVar('template'),
-                        'blk_' . $block->getVar('bid')
-                    );
-                }
-            }
-        }
+        $module = $this->getModuleById($mid);
+        $xoopsTpl = new XoopsTpl();
+        $xoopsTpl->clearModuleCompileCache($module->getVar('dirname'));
     }
 
     /**

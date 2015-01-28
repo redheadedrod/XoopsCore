@@ -27,7 +27,7 @@ $xoops = Xoops::getInstance();
 $xoops->db();
 global $xoopsDB;
 $db = $xoopsDB;
-$xoops->header('protector_prefix.html');
+$xoops->header('admin:protector/protector_prefix.html');
 
 $error = '';
 // COPY TABLES
@@ -305,7 +305,7 @@ foreach ($prefixes as $prefix) {
     $table_arr['ticket'] = $ticket_input;
     $table_arr['del'] = $del_button;
 
-    $xoops->tpl()->append_by_ref('table', $table_arr);
+    $xoops->tpl()->appendByRef('table', $table_arr);
     unset($table_arr);
 }
 $xoops->footer();

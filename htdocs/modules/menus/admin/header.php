@@ -11,7 +11,7 @@
 
 /**
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         http://www.gnu.org/licenses/gpl-2.0.html GNU Public License
+ * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         Menus
  * @since           1.0
  * @author          trabis <lusopoemas@gmail.com>
@@ -22,4 +22,3 @@ require_once dirname(dirname(dirname(__DIR__))) . '/include/cp_header.php';
 
 $xoops = Xoops::getInstance();
 $helper = Xoops\Module\Helper::getHelper('menus');
-$request = Xoops_Request::getInstance();

@@ -220,7 +220,7 @@ class XoopsLoad
             'movabletypeapi' => XOOPS_ROOT_PATH . '/class/xml/rpc/movabletypeapi.php',
             'mytextsanitizer' => XOOPS_ROOT_PATH . '/class/module.textsanitizer.php',
             'mytextsanitizerextension' => XOOPS_ROOT_PATH . '/class/module.textsanitizer.php',
-            'phpmailer' => XOOPS_ROOT_PATH . '/class/mail/phpmailer/class.phpmailer.php',
+            //'phpmailer' => XOOPS_ROOT_PATH . '/class/mail/phpmailer/class.phpmailer.php',
             'rssauthorhandler' => XOOPS_ROOT_PATH . '/class/xml/rss/xmlrss2parser.php',
             'rsscategoryhandler' => XOOPS_ROOT_PATH . '/class/xml/rss/xmlrss2parser.php',
             'rsscommentshandler' => XOOPS_ROOT_PATH . '/class/xml/rss/xmlrss2parser.php',
@@ -374,7 +374,7 @@ class XoopsLoad
             //'xoopsmoduleadmin' => XOOPS_ROOT_PATH . '/class/moduleadmin.php',
             'xoopsmodule' => XOOPS_ROOT_PATH . '/kernel/module.php',
             'xoopsmodulehandler' => XOOPS_ROOT_PATH . '/kernel/module.php',
-            'xoopsmultimailer' => XOOPS_ROOT_PATH . '/class/mail/xoopsmultimailer.php',
+            'xoopsmultimailer' => XOOPS_ROOT_PATH . '/class/xoopsmultimailer.php',
             //'xoopsnotification' => XOOPS_ROOT_PATH . '/kernel/notification.php',
             //'xoopsnotificationhandler' => XOOPS_ROOT_PATH . '/kernel/notification.php',
             'xoopsobject' => XOOPS_ROOT_PATH . '/kernel/object.php',
@@ -391,6 +391,7 @@ class XoopsLoad
             'xoopsranks' => XOOPS_ROOT_PATH . '/kernel/ranks.php',
             'xoopsrankshandler' => XOOPS_ROOT_PATH . '/kernel/ranks.php',
             //'xoopsregistry' => XOOPS_ROOT_PATH . '/class/registry.php',
+            'xoopsrequest' => XOOPS_ROOT_PATH . '/class/xoopsrequest.php',
             //'xoopssecurity' => XOOPS_ROOT_PATH . '/class/xoopssecurity.php',
             'xoopssessionhandler' => XOOPS_ROOT_PATH . '/kernel/session.php',
             'xoopssimpleform' => XOOPS_ROOT_PATH . '/class/xoopsform/simpleform.php',
@@ -549,12 +550,25 @@ class XoopsLoad
             exit('Security check: Illegal character in filename');
         }
     }
-}
 
-if (!defined('XOOPS_AUTOLOAD')) {
-    define('XOOPS_AUTOLOAD', true);
-    spl_autoload_register(array('XoopsLoad', 'load'));
-    if (!XOOPS_PATH == '') {
-        include XOOPS_PATH . '/vendor/autoload.php';
+    /**
+     * startAutoloader enable the autoloader
+     *
+     * @param string $path path of the library directory where composer managed
+     *                     vendor directory can be found.
+     * @return void
+     */
+    public static function startAutoloader($path)
+    {
+        static $libPath = null;
+
+        if ($libPath === null) {
+            $loaderPath = $path . '/vendor/autoload.php';
+            if (self::fileExists($loaderPath)) {
+                $libPath = $path;
+                include $loaderPath;
+            }
+            spl_autoload_register(array('XoopsLoad', 'load'));
+        }
     }
 }

@@ -9,11 +9,13 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
+use Xoops\Core\Request;
+
 /**
  * page module
  *
  * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license         GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         page
  * @since           2.6.0
  * @author          Mage Grégory (AKA Mage)
@@ -23,10 +25,10 @@
 include __DIR__ . '/header.php';
 
 // Get Action type
-$op = $request->asStr('op', 'global');
+$op = Request::getString('op', 'global');
 
 // Call header
-$xoops->header('page_admin_permissions.html');
+$xoops->header('admin:page/page_admin_permissions.tpl');
 
 $admin_page = new \Xoops\Module\Admin();
 $admin_page->renderNavigation('permissions.php');
@@ -80,7 +82,7 @@ switch ($op) {
                 $content['id'] = $content_id;
                 $content['title'] = $content_arr[$i]->getVar('content_title');
                 $content['permissions'] = $perms;
-                $xoops->tpl()->append_by_ref('content', $content);
+                $xoops->tpl()->appendByRef('content', $content);
                 unset($content);
             }
             // Display Page Navigation

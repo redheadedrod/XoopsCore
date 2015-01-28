@@ -9,6 +9,8 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+use Xoops\Core\Request;
+
 /**
  * @copyright       The XUUPS Project http://sourceforge.net/projects/xuups/
  * @license         GNU GPL V2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
@@ -23,7 +25,7 @@ include_once __DIR__ . '/header.php';
 $xoops = Xoops::getInstance();
 $xoops->disableErrorReporting();
 
-$itemid = \Xmf\Request::getInt('itemid');
+$itemid = Request::getInt('itemid');
 
 if ($itemid == 0) {
     $xoops->redirect("javascript:history.go(-1)", 1, _MD_PUBLISHER_NOITEMSELECTED);
@@ -84,4 +86,4 @@ if ($publisher->getConfig('print_footer') == 'index footer' || $publisher->getCo
 
 $xoopsTpl->assign('display_whowhen_link', $publisher->getConfig('item_disp_whowhen_link'));
 
-$xoopsTpl->display('module:publisher|publisher_print.tpl');
+$xoopsTpl->display('module:publisher/publisher_print.tpl');

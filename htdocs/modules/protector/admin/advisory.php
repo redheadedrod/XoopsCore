@@ -25,7 +25,7 @@ global $xoopsDB;
 $db = $xoopsDB;
 
 // Call header
-$xoops->header('protector_advisory.html');
+$xoops->header('admin:protector/protector_advisory.html');
 
 $admin_page = new \Xoops\Module\Admin();
 $admin_page->renderNavigation('advisory.php');
@@ -140,8 +140,8 @@ $security_arr[$i]['text'] = '';
 $i++;
 
 foreach (array_keys($security_arr) as $i) {
-    $xoops->tpl()->append_by_ref('security', $security_arr[$i]);
-    $xoops->tpl()->append_by_ref('popup_security', $security_arr[$i]);
+    $xoops->tpl()->appendByRef('security', $security_arr[$i]);
+    $xoops->tpl()->appendByRef('popup_security', $security_arr[$i]);
 }
 
 // Check contaminations

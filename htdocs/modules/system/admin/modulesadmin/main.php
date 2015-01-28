@@ -13,7 +13,7 @@
  * Modules Manager
  *
  * @copyright   The XOOPS Project http://sourceforge.net/projects/xoops/
- * @license     GNU GPL 2 (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license     GNU GPL 2 (http://www.gnu.org/licenses/gpl-2.0.html)
  * @author      Kazumi Ono (AKA onokazu)
  * @package     system
  * @version     $Id$
@@ -28,11 +28,11 @@ if (!$xoops->isUser() || !$xoops->isModule() || !$xoops->user->isAdmin($xoops->m
     exit(XoopsLocale::E_NO_ACCESS_PERMISSION);
 }
 
-if (isset($_POST)) {
-    foreach ($_POST as $k => $v) {
-        ${$k} = $v;
-    }
-}
+//if (isset($_POST)) {
+//    foreach ($_POST as $k => $v) {
+//        ${$k} = $v;
+//    }
+//}
 
 // Get Action type
 $op = $system->cleanVars($_REQUEST, 'op', 'list', 'string');
@@ -49,7 +49,7 @@ switch ($op) {
 
     case 'list':
         // Call Header
-        $xoops->header('system_modules.html');
+        $xoops->header('admin:system/system_modules.tpl');
         // Define Stylesheet
         $xoops->theme()->addStylesheet('modules/system/css/admin.css');
         // Define scripts
@@ -176,7 +176,7 @@ switch ($op) {
     case 'install':
         $module = $system->cleanVars($_POST, 'dirname', '', 'string');
         // Call Header
-        $xoops->header('system_modules_logger.html');
+        $xoops->header('admin:system/system_modules_logger.tpl');
         // Define Stylesheet
         $xoops->theme()->addStylesheet('modules/system/css/admin.css');
         // Define Breadcrumb and tips
@@ -216,7 +216,7 @@ switch ($op) {
         $module_handler = $xoops->getHandlerModule();
         $module = $module_handler->getById($mid);
         // Call Header
-        $xoops->header('system_modules_logger.html');
+        $xoops->header('admin:system/system_modules_logger.tpl');
         // Define Stylesheet
         $xoops->theme()->addStylesheet('modules/system/css/admin.css');
         // Define Breadcrumb and tips
@@ -253,7 +253,7 @@ switch ($op) {
         $block_handler = $xoops->getHandlerBlock();
         $module = $module_handler->getById($mid);
         // Call Header
-        $xoops->header('system_modules_logger.html');
+        $xoops->header('admin:system/system_modules_logger.tpl');
         // Define Stylesheet
         $xoops->theme()->addStylesheet('modules/system/css/admin.css');
         // Define Breadcrumb and tips
